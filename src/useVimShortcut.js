@@ -1,7 +1,28 @@
-import { useLayoutEffect, useCallback, useRef } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
+
+const tagsCanFocus = [
+  'a[href]',
+  'area[href]',
+  'input',
+  'select',
+  'textarea',
+  'button'
+];
+const canFocusElementSelector = `a[href]:not([tabindex='-1']),
+  area[href]:not([tabindex='-1']),
+  input:not([disabled]):not([tabindex='-1']),
+  select:not([disabled]):not([tabindex='-1']),
+  textarea:not([disabled]):not([tabindex='-1']),
+  button:not([disabled]):not([tabindex='-1']),
+  iframe:not([tabindex='-1']),
+  [tabindex]:not([tabindex='-1']),
+  [contentEditable=true]:not([tabindex='-1'])`;
 
 const canFocus = element => {
   if (!element) return true;
+  if (element.matches(canFocusElementSelector)) {
+    return true;
+  }
   const tabindex = element.getAttribute('tabindex');
   return tabindex !== null && +tabindex >= 0;
 };
@@ -9,7 +30,7 @@ const canFocus = element => {
 const focusElement = element => {
   if (!canFocus(element)) {
     console.error(
-      '当前 element 不支持 focus，请添加 tabIndex，或者使用满足条件的标签'
+      `当前 element 不支持 focus，请添加 tabIndex，或者使用满足条件的标签: ${tagsCanFocus}`
     );
     return;
   }
@@ -32,14 +53,14 @@ export default function useVimShortcut(containerRef, listLength) {
         case 'arrowdown':
         case 'j': {
           if (index < listLength - 1) selectedIndex.current = ++index;
-          focusElement(containerRef.children[index]);
+          focusElement(containerRef.current.children[index]);
           break;
         }
         case 'arrowup':
         case 'k': {
           if (index < 1) return;
           selectedIndex.current = --index;
-          focusElement(containerRef.children[index]);
+          focusElement(containerRef.current.children[index]);
           if (!index) {
             document.body.scrollIntoView();
           }
@@ -54,7 +75,7 @@ export default function useVimShortcut(containerRef, listLength) {
           ) {
             selectedIndex.current = index = 0;
           }
-          focusElement(containerRef.children[index]);
+          focusElement(containerRef.current.children[index]);
           break;
         }
         default:
@@ -65,11 +86,10 @@ export default function useVimShortcut(containerRef, listLength) {
     [containerRef, listLength]
   );
 
-  useLayoutEffect(() => {
-    if (!containerRef) {
+  useEffect(() => {
+    if (!containerRef.current) {
       return;
     }
-    console.log(containerRef);
     window.addEventListener('keydown', onKeyDownHandler);
     return () => window.removeEventListener('keydown', onKeyDownHandler);
   }, [containerRef, onKeyDownHandler]);

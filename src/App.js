@@ -38,7 +38,7 @@ const App = () => {
   }, []);
 
   const section = useRef();
-  useVimShortcut(section.current, cards.length);
+  useVimShortcut(section, cards.length);
 
   return (
     <main className="container">
