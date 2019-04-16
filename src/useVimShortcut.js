@@ -1,4 +1,20 @@
-import React, { useLayoutEffect, useCallback, useRef } from 'react';
+import { useLayoutEffect, useCallback, useRef } from 'react';
+
+const canFocus = element => {
+  if (!element) return true;
+  const tabindex = element.getAttribute('tabindex');
+  return tabindex !== null && +tabindex >= 0;
+};
+
+const focusElement = element => {
+  if (!canFocus(element)) {
+    console.error(
+      '当前 element 不支持 focus，请添加 tabIndex，或者使用满足条件的标签'
+    );
+    return;
+  }
+  element.focus();
+};
 
 export default function useVimShortcut(containerRef, listLength) {
   const selectedIndex = useRef(-1);
@@ -16,15 +32,14 @@ export default function useVimShortcut(containerRef, listLength) {
         case 'arrowdown':
         case 'j': {
           if (index < listLength - 1) selectedIndex.current = ++index;
-          console.log(containerRef.children[index]);
-          containerRef.children[index].focus();
+          focusElement(containerRef.children[index]);
           break;
         }
         case 'arrowup':
         case 'k': {
           if (index < 1) return;
           selectedIndex.current = --index;
-          containerRef.children[index].focus();
+          focusElement(containerRef.children[index]);
           if (!index) {
             document.body.scrollIntoView();
           }
@@ -39,7 +54,7 @@ export default function useVimShortcut(containerRef, listLength) {
           ) {
             selectedIndex.current = index = 0;
           }
-          containerRef.children[index].focus();
+          focusElement(containerRef.children[index]);
           break;
         }
         default:
