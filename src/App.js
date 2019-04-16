@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import TrelloCard from './TrelloCard';
 import { indexBy, convertCustomFieldItems } from './utils';
+import useVimShortcut from './useVimShortcut';
 
 const trelloAPI = 'https://trello.com/b/FuVtXQQ5/零售小程序版本记录.json';
 const indexById = indexBy('id');
@@ -35,11 +36,17 @@ const App = () => {
 
     adaptApi();
   }, []);
+
+  const section = useRef();
+  useVimShortcut(section.current, cards.length);
+
   return (
     <main className="container">
-      {cards.map(card => (
-        <TrelloCard {...card} key={card.id} />
-      ))}
+      <section ref={section}>
+        {cards.map(card => (
+          <TrelloCard {...card} key={card.id} />
+        ))}
+      </section>
     </main>
   );
 };
