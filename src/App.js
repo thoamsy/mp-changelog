@@ -1,4 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
+import Timeline from 'antd/lib/timeline';
+import Icon from 'antd/lib/icon';
 import TrelloCard from './TrelloCard';
 import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
@@ -41,11 +43,18 @@ const App = () => {
   useVimShortcut(section, cards.length);
 
   return (
-    <main className="container">
-      <section ref={section}>
-        {cards.map(card => (
-          <TrelloCard {...card} key={card.id} />
-        ))}
+    <main className="section">
+      <section ref={section} className="container">
+        <Timeline>
+          {cards.map(card => (
+            <Timeline.Item color="green">
+              <TrelloCard {...card} key={card.id} />
+            </Timeline.Item>
+          ))}
+          <Timeline.Item dot={<Icon type="frown" theme="twoTone" />}>
+            消失在历史长河中的版本记录
+          </Timeline.Item>
+        </Timeline>
       </section>
     </main>
   );

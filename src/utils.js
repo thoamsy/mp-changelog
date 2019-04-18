@@ -7,7 +7,7 @@ export function convertCustomFieldItems(fields, fieldMaps) {
     const theField = fieldMaps[item.idCustomField];
     return {
       name: theField.name,
-      value: item.value.text || item.value.checked,
+      value: item.value.text || !!item.value.checked,
       id: item.id
     };
   });
