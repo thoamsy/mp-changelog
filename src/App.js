@@ -40,7 +40,10 @@ const App = () => {
   }, []);
 
   const section = useRef();
-  useVimShortcut(section, cards.length);
+  useVimShortcut(section, {
+    listLength: cards.length,
+    selector: '.trello-card'
+  });
 
   return (
     <main className="section">

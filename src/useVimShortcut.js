@@ -37,9 +37,16 @@ const focusElement = element => {
   element.focus();
 };
 
-export default function useVimShortcut(containerRef, listLength) {
+export default function useVimShortcut(containerRef, { listLength, selector }) {
   const selectedIndex = useRef(-1);
-  const lastKey = useRef(null);
+  const lastKey = useRef();
+  const children = useRef([]);
+
+  useEffect(() => {
+    children.current = selector
+      ? containerRef.current.querySelectorAll(selector)
+      : containerRef.current.children;
+  }, [containerRef, listLength, selector]);
 
   const onKeyDownHandler = useCallback(
     e => {
@@ -53,14 +60,14 @@ export default function useVimShortcut(containerRef, listLength) {
         case 'arrowdown':
         case 'j': {
           if (index < listLength - 1) selectedIndex.current = ++index;
-          focusElement(containerRef.current.children[index]);
+          focusElement(children.current[index]);
           break;
         }
         case 'arrowup':
         case 'k': {
           if (index < 1) return;
           selectedIndex.current = --index;
-          focusElement(containerRef.current.children[index]);
+          focusElement(children.current[index]);
           if (!index) {
             document.body.scrollIntoView();
           }
@@ -75,7 +82,7 @@ export default function useVimShortcut(containerRef, listLength) {
           ) {
             selectedIndex.current = index = 0;
           }
-          focusElement(containerRef.current.children[index]);
+          focusElement(children.current[index]);
           break;
         }
         default:
@@ -83,7 +90,7 @@ export default function useVimShortcut(containerRef, listLength) {
       }
       lastKey.current = e;
     },
-    [containerRef, listLength]
+    [listLength]
   );
 
   useEffect(() => {
@@ -92,5 +99,5 @@ export default function useVimShortcut(containerRef, listLength) {
     }
     window.addEventListener('keydown', onKeyDownHandler);
     return () => window.removeEventListener('keydown', onKeyDownHandler);
-  }, [containerRef, onKeyDownHandler]);
+  }, [containerRef, onKeyDownHandler, selector]);
 }
