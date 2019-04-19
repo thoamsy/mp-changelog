@@ -28,9 +28,10 @@ const TrelloCard = ({
     [labels]
   );
 
-  const actions = useMemo(() => [<Icon type="bulb" onClick={toggleDetail} />], [
-    toggleDetail
-  ]);
+  const actions = useMemo(
+    () => [<Icon type="ellipsis" onClick={toggleDetail} />],
+    [toggleDetail]
+  );
 
   const cardRef = useRef();
 
