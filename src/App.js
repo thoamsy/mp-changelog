@@ -22,8 +22,8 @@ const App = () => {
       const trelloCards =
         JSON.parse(trelloFromCache) || (await fetchTrelloInformation());
       const { cards, customFields, labelNames } = trelloCards;
-      setCards(cards);
       const customFieldsMap = indexById(customFields);
+
       cards.forEach(
         card =>
           (card.fields = convertCustomFieldItems(
@@ -31,6 +31,7 @@ const App = () => {
             customFieldsMap
           ))
       );
+      setCards(cards.slice(0, -1)); // 最后一张比较特殊，不需要
       !trelloFromCache &&
         localStorage.setItem('trello', JSON.stringify(trelloCards));
     }
