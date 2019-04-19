@@ -47,7 +47,7 @@ const App = () => {
 
   return (
     <main className="section">
-      <section ref={section} className="container" style={{ maxWidth: '60%' }}>
+      <section ref={section} className="container" style={{ maxWidth: '50%' }}>
         <Timeline>
           {cards.map(card => (
             <Timeline.Item color="green" key={card.id}>
