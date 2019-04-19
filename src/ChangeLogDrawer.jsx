@@ -15,7 +15,6 @@ const ChangeLogDrawer = ({ changelog, visible, onClose, container }) => {
       placement="right"
       mask={false}
       getContainer={() => container.current}
-      closable={false}
       onClose={onClose}
       visible={visible}
     >

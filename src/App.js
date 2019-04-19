@@ -1,6 +1,14 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+  useMemo
+} from 'react';
 import Timeline from 'antd/lib/timeline';
 import Icon from 'antd/lib/icon';
+import Popover from 'antd/lib/popover';
+import Tooltip from 'antd/lib/tooltip';
 import TrelloCard from './TrelloCard';
 import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
@@ -13,6 +21,18 @@ const fetchTrelloInformation = () => {
     mode: 'cors'
   }).then(res => res.ok && res.json());
 };
+
+const clockIcon = due => (
+  <Popover content={new Date(due).toLocaleDateString()} title="预计发布时间">
+    <Icon spin type="clock-circle-o" theme="twoTone" style={{ fontSize: 18 }} />
+  </Popover>
+);
+
+const rocketIcon = (
+  <Tooltip title="已发布">
+    <Icon type="rocket" rotate={30} theme="twoTone" style={{ fontSize: 18 }} />
+  </Tooltip>
+);
 
 const App = () => {
   const [cards, setCards] = useState([]);
@@ -64,12 +84,20 @@ const App = () => {
       <section ref={section} className="container card-container">
         <Timeline>
           {cards.map((card, index) => (
-            <Timeline.Item color="green" key={card.id}>
+            <Timeline.Item
+              color="green"
+              key={card.id}
+              dot={
+                !card.due || card.dueComplete ? rocketIcon : clockIcon(card.due)
+              }
+            >
               <TrelloCard
                 name={card.name}
                 desc={card.desc}
                 fields={card.fields}
                 labels={card.labels}
+                due={card.due}
+                dueComplete={card.dueComplete}
                 visible={visible[index]}
                 toggleDetail={() => toggleDetail(index)}
                 onCloseDrawer={() => onClose(index)}
