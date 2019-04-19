@@ -5,6 +5,7 @@
   "dependencies": {
     "antd": "^3.16.3",
     "bulma": "^0.7.4",
+    "markdown-it": "^8.4.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8"

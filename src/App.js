@@ -21,7 +21,7 @@ const App = () => {
       const trelloFromCache = localStorage.getItem('trello');
       const trelloCards =
         JSON.parse(trelloFromCache) || (await fetchTrelloInformation());
-      const { cards, customFields, labelNames } = trelloCards;
+      const { cards, customFields } = trelloCards;
       const customFieldsMap = indexById(customFields);
 
       cards.forEach(
