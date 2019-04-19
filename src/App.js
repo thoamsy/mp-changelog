@@ -55,6 +55,7 @@ const rocketIcon = (
 const App = () => {
   const [cards, setCards] = useState([]);
   const [visible, setVisible] = useState([]);
+
   useEffect(() => {
     async function adaptApi() {
       const trelloFromCache = localStorage.getItem('trello');
@@ -81,7 +82,6 @@ const App = () => {
 
   const toggleDetail = useCallback(index => {
     setVisible(state => state.map((s, i) => (i === index ? !s : s)));
-    // setChangelog(cards[index].desc);
   }, []);
 
   const onClose = useCallback(

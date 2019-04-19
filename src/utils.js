@@ -3,12 +3,14 @@ export const indexBy = key => (lists = []) => {
 };
 
 export function convertCustomFieldItems(fields, fieldMaps) {
-  return fields.map(item => {
-    const theField = fieldMaps[item.idCustomField];
-    return {
-      name: theField.name,
-      value: item.value.text || !!item.value.checked,
-      id: item.id
-    };
-  });
+  return fields
+    .map(item => {
+      const theField = fieldMaps[item.idCustomField];
+      return {
+        name: theField.name,
+        value: item.value.text,
+        id: item.id
+      };
+    })
+    .filter(item => !!item.value);
 }
