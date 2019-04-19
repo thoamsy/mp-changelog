@@ -9,8 +9,6 @@ import Steps from 'antd/lib/steps';
 
 import ChangeLogDrawer from './ChangeLogDrawer';
 
-const steps = ['开发中', '体验版已发布', '稳定版已发布'];
-
 const TrelloCard = ({
   fields = [],
   showStep,
@@ -38,18 +36,27 @@ const TrelloCard = ({
     [toggleDetail]
   );
 
+  const steps = useMemo(
+    () =>
+      showStep && (
+        <Steps current={process.length} size="small">
+          <Steps.Step title="开发中" icon={<Icon type="tool" />} />
+          <Steps.Step title="发布体验版" icon={<Icon type="coffee" />} />
+          <Steps.Step
+            title="发布稳定版"
+            icon={<Icon type="rocket" rotate={30} />}
+          />
+        </Steps>
+      ),
+    [process.length, showStep]
+  );
+
   const cardRef = useRef();
 
   return (
     <section tabIndex="0" className="trello-card" ref={cardRef}>
       <Card extra={tags} actions={actions} title={`版本号：${name}`}>
-        {showStep && (
-          <Steps current={process.length} size="small">
-            {steps.map(step => (
-              <Steps.Step title={step} key={step} />
-            ))}
-          </Steps>
-        )}
+        {steps}
         <Row gutter={16}>
           {fields.map(field => (
             <Col span={24} key={field.id}>
