@@ -1,5 +1,6 @@
 {
-  "name": "trello-api",
+  "name": "mp-changelog",
+  "homepage": "https://thoamsy.github.io/mp-changelog",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
