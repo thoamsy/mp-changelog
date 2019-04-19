@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Timeline from 'antd/lib/timeline';
 import Icon from 'antd/lib/icon';
 import TrelloCard from './TrelloCard';
+import ChangeLogDrawer from './ChangeLogDrawer';
 import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
 
@@ -45,17 +46,32 @@ const App = () => {
     selector: '.trello-card'
   });
 
+  const [visible, setVisible] = useState(false);
+  const [changelog, setChangelog] = useState('');
+
+  const toggleDetail = useCallback(
+    index => {
+      setVisible(!visible);
+      setChangelog(cards[index].desc);
+    },
+    [visible, cards]
+  );
+
+  const onClose = useCallback(() => setVisible(false), []);
+
   return (
     <main className="section">
       <section ref={section} className="container" style={{ maxWidth: '50%' }}>
         <Timeline>
-          {cards.map(card => (
+          {cards.map((card, index) => (
             <Timeline.Item color="green" key={card.id}>
               <TrelloCard
                 name={card.name}
                 desc={card.desc}
                 fields={card.fields}
                 labels={card.labels}
+                index={index}
+                toggleDetail={toggleDetail}
               />
             </Timeline.Item>
           ))}
@@ -66,6 +82,12 @@ const App = () => {
           )}
         </Timeline>
       </section>
+      <ChangeLogDrawer
+        changelog={changelog}
+        visible={visible}
+        toggleDetail={toggleDetail}
+        onClose={onClose}
+      />
     </main>
   );
 };

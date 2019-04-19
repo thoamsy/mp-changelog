@@ -1,17 +1,19 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import Card from 'antd/lib/card';
 import Icon from 'antd/lib/icon';
 import Typography from 'antd/lib/typography';
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
 import Tag from 'antd/lib/tag';
-import Drawer from 'antd/lib/drawer';
 
-import Markdown from 'markdown-it';
-
-const md = new Markdown();
-
-const TrelloCard = ({ fields = [], name, desc, labels }) => {
+const TrelloCard = ({
+  fields = [],
+  name,
+  desc,
+  labels,
+  toggleDetail,
+  index
+}) => {
   const tags = useMemo(
     () =>
       labels.map(label => (
@@ -21,16 +23,11 @@ const TrelloCard = ({ fields = [], name, desc, labels }) => {
       )),
     [labels]
   );
-  const [visible, setVisible] = useState(false);
-  const descWithParse = useMemo(() => md.render(desc), [desc]);
 
-  const toggleDetail = useCallback(() => {
-    setVisible(!visible);
-  }, [visible]);
-
-  const actions = useMemo(() => [<Icon type="bulb" onClick={toggleDetail} />], [
-    toggleDetail
-  ]);
+  const actions = useMemo(
+    () => [<Icon type="bulb" onClick={() => toggleDetail(index)} />],
+    [index, toggleDetail]
+  );
 
   return (
     <section tabIndex="0" className="trello-card">
@@ -52,19 +49,6 @@ const TrelloCard = ({ fields = [], name, desc, labels }) => {
           ))}
         </Row>
       </Card>
-      <Drawer
-        width={500}
-        placement="right"
-        maskClosable
-        onClose={toggleDetail}
-        destroyOnClose
-        visible={visible}
-      >
-        <section
-          className="content"
-          dangerouslySetInnerHTML={{ __html: descWithParse }}
-        />
-      </Drawer>
     </section>
   );
 };
