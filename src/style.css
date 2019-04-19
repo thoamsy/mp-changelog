@@ -1,0 +1,5 @@
+@media screen and (min-width: 800px) {
+  .container.card-container {
+    max-width: 50%;
+  }
+}
