@@ -40,12 +40,6 @@ const App = () => {
     adaptApi();
   }, []);
 
-  const section = useRef();
-  useVimShortcut(section, {
-    listLength: cards.length,
-    selector: '.trello-card'
-  });
-
   const [visible, setVisible] = useState(false);
   const [changelog, setChangelog] = useState('');
 
@@ -58,6 +52,13 @@ const App = () => {
   );
 
   const onClose = useCallback(() => setVisible(false), []);
+
+  const section = useRef();
+  useVimShortcut(section, {
+    listLength: cards.length,
+    selector: '.trello-card',
+    onEnter: toggleDetail
+  });
 
   return (
     <main className="section">

@@ -37,7 +37,10 @@ const focusElement = element => {
   element.focus();
 };
 
-export default function useVimShortcut(containerRef, { listLength, selector }) {
+export default function useVimShortcut(
+  containerRef,
+  { listLength, selector, onEnter }
+) {
   const selectedIndex = useRef(-1);
   const lastKeyDown = useRef({ key: '' });
   const children = useRef([]);
@@ -67,6 +70,7 @@ export default function useVimShortcut(containerRef, { listLength, selector }) {
   const onKeyDownHandler = useCallback(
     e => {
       const key = e.key.toLowerCase();
+      let index = selectedIndex.current;
       switch (key) {
         case 'tab': {
           if (e.shiftKey) {
@@ -88,7 +92,6 @@ export default function useVimShortcut(containerRef, { listLength, selector }) {
           break;
         }
         case 'g': {
-          let index = selectedIndex.current;
           if (e.shiftKey) {
             selectedIndex.current = index = listLength - 1;
           } else if (
@@ -100,12 +103,17 @@ export default function useVimShortcut(containerRef, { listLength, selector }) {
           focusElement(children.current[index]);
           break;
         }
+
+        case 'enter': {
+          onEnter && onEnter(index);
+          break;
+        }
         default:
           break;
       }
       lastKeyDown.current = e;
     },
-    [listLength, moveDown]
+    [listLength, moveDown, onEnter]
   );
 
   useEffect(() => {
