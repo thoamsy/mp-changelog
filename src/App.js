@@ -4,6 +4,7 @@ import Icon from 'antd/lib/icon';
 import Popover from 'antd/lib/popover';
 import Tooltip from 'antd/lib/tooltip';
 import Statistic from 'antd/lib/statistic';
+import Spin from 'antd/lib/spin';
 import TrelloCard from './TrelloCard';
 import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
@@ -52,9 +53,7 @@ const App = () => {
 
   useEffect(() => {
     async function adaptApi() {
-      const trelloFromCache = localStorage.getItem('trello');
-      const trelloCards =
-        JSON.parse(trelloFromCache) || (await fetchTrelloInformation());
+      const trelloCards = await fetchTrelloInformation();
       const { cards, customFields } = trelloCards;
       const customFieldsMap = indexById(customFields);
 
@@ -66,8 +65,6 @@ const App = () => {
       });
       setCards(cards.slice(0, -1)); // 最后一张比较特殊，不需要
       setVisible(Array.from({ length: cards.length }, () => false));
-      !trelloFromCache &&
-        localStorage.setItem('trello', JSON.stringify(trelloCards));
     }
 
     adaptApi();
@@ -91,40 +88,49 @@ const App = () => {
   });
 
   return (
-    <main className="section">
+    <div className="section">
       <section ref={section} className="container card-container">
-        <Timeline>
-          {cards.map((card, index) => (
-            <Timeline.Item
-              color="green"
-              key={card.id}
-              dot={
-                !card.due || card.dueComplete ? rocketIcon : clockIcon(card.due)
-              }
-            >
-              <TrelloCard
-                name={card.name}
-                desc={card.desc}
-                fields={card.fields}
-                labels={card.labels}
-                due={card.due}
-                dueComplete={card.dueComplete}
-                process={card.process}
-                visible={visible[index]}
-                toggleDetail={() => toggleDetail(index)}
-                onCloseDrawer={() => onClose(index)}
-                showStep={index === 0}
-              />
-            </Timeline.Item>
-          ))}
-          {!!cards.length && (
-            <Timeline.Item dot={<Icon type="frown" theme="twoTone" />}>
-              消失在历史长河中的版本记录
-            </Timeline.Item>
-          )}
-        </Timeline>
+        <h3 className="title">零售小程序版本记录</h3>
+        {cards.length ? (
+          <main>
+            <Timeline>
+              {cards.map((card, index) => (
+                <Timeline.Item
+                  color="green"
+                  key={card.id}
+                  dot={
+                    !card.due || card.dueComplete
+                      ? rocketIcon
+                      : clockIcon(card.due)
+                  }
+                >
+                  <TrelloCard
+                    name={card.name}
+                    desc={card.desc}
+                    fields={card.fields}
+                    labels={card.labels}
+                    due={card.due}
+                    dueComplete={card.dueComplete}
+                    process={card.process}
+                    visible={visible[index]}
+                    toggleDetail={() => toggleDetail(index)}
+                    onCloseDrawer={() => onClose(index)}
+                    showStep={index === 0}
+                  />
+                </Timeline.Item>
+              ))}
+              {!!cards.length && (
+                <Timeline.Item dot={<Icon type="frown" theme="twoTone" />}>
+                  消失在历史长河中的版本记录
+                </Timeline.Item>
+              )}
+            </Timeline>
+          </main>
+        ) : (
+          <Spin size="large" />
+        )}
       </section>
-    </main>
+    </div>
   );
 };
 
