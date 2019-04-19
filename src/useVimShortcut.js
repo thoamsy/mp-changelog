@@ -39,7 +39,7 @@ const focusElement = element => {
 
 export default function useVimShortcut(containerRef, { listLength, selector }) {
   const selectedIndex = useRef(-1);
-  const lastKey = useRef();
+  const lastKeyDown = useRef({ key: '' });
   const children = useRef([]);
 
   useEffect(() => {
@@ -48,37 +48,52 @@ export default function useVimShortcut(containerRef, { listLength, selector }) {
       : containerRef.current.children;
   }, [containerRef, listLength, selector]);
 
+  const moveDown = useCallback(() => {
+    let index = selectedIndex.current;
+    if (index < listLength - 1) selectedIndex.current = ++index;
+    focusElement(children.current[index]);
+  }, [listLength]);
+
+  const moveUp = () => {
+    let index = selectedIndex.current;
+    if (index < 1) return;
+    selectedIndex.current = --index;
+    focusElement(children.current[index]);
+    if (!index) {
+      document.body.scrollIntoView();
+    }
+  };
+
   const onKeyDownHandler = useCallback(
     e => {
       const key = e.key.toLowerCase();
-      let index = selectedIndex.current;
       switch (key) {
         case 'tab': {
+          if (e.shiftKey) {
+            moveUp();
+          } else {
+            moveDown();
+          }
           e.preventDefault();
           break;
         }
         case 'arrowdown':
         case 'j': {
-          if (index < listLength - 1) selectedIndex.current = ++index;
-          focusElement(children.current[index]);
+          moveDown();
           break;
         }
         case 'arrowup':
         case 'k': {
-          if (index < 1) return;
-          selectedIndex.current = --index;
-          focusElement(children.current[index]);
-          if (!index) {
-            document.body.scrollIntoView();
-          }
+          moveUp();
           break;
         }
         case 'g': {
+          let index = selectedIndex.current;
           if (e.shiftKey) {
             selectedIndex.current = index = listLength - 1;
           } else if (
-            e.key === lastKey.current.key &&
-            e.metaKey === lastKey.current.metaKey
+            e.key === lastKeyDown.current.key &&
+            e.metaKey === lastKeyDown.current.metaKey
           ) {
             selectedIndex.current = index = 0;
           }
@@ -88,9 +103,9 @@ export default function useVimShortcut(containerRef, { listLength, selector }) {
         default:
           break;
       }
-      lastKey.current = e;
+      lastKeyDown.current = e;
     },
-    [listLength]
+    [listLength, moveDown]
   );
 
   useEffect(() => {
