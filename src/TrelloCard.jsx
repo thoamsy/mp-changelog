@@ -1,15 +1,26 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Card from 'antd/lib/card';
 import Icon from 'antd/lib/icon';
 import Typography from 'antd/lib/typography';
 import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
+import Tag from 'antd/lib/tag';
 
-const TrelloCard = ({ fields = [], name, desc }) => {
+const TrelloCard = ({ fields = [], name, desc, labels }) => {
+  const tags = useMemo(
+    () =>
+      labels.map(label => (
+        <Tag key={label.id} color={label.color}>
+          {label.name}
+        </Tag>
+      )),
+    [labels]
+  );
+  const actions = useMemo(() => [<Icon type="bulb" />], []);
+
   return (
     <section tabIndex="0" className="trello-card">
-      <Card actions={[<Icon type="bulb" />]} title={`版本号：${name}`}>
-        {/* <Card.Meta title={name} /> */}
+      <Card extra={tags} actions={actions} title={`版本号：${name}`}>
         <Row gutter={16}>
           {fields.map(field => (
             <Col span={12} key={field.id}>

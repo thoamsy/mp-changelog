@@ -31,7 +31,6 @@ const App = () => {
             customFieldsMap
           ))
       );
-      console.log(customFieldsMap);
       !trelloFromCache &&
         localStorage.setItem('trello', JSON.stringify(trelloCards));
     }
@@ -47,16 +46,23 @@ const App = () => {
 
   return (
     <main className="section">
-      <section ref={section} className="container">
+      <section ref={section} className="container" style={{ maxWidth: '60%' }}>
         <Timeline>
           {cards.map(card => (
-            <Timeline.Item color="green">
-              <TrelloCard {...card} key={card.id} />
+            <Timeline.Item color="green" key={card.id}>
+              <TrelloCard
+                name={card.name}
+                desc={card.desc}
+                fields={card.fields}
+                labels={card.labels}
+              />
             </Timeline.Item>
           ))}
-          <Timeline.Item dot={<Icon type="frown" theme="twoTone" />}>
-            消失在历史长河中的版本记录
-          </Timeline.Item>
+          {!!cards.length && (
+            <Timeline.Item dot={<Icon type="frown" theme="twoTone" />}>
+              消失在历史长河中的版本记录
+            </Timeline.Item>
+          )}
         </Timeline>
       </section>
     </main>
