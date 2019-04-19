@@ -9,6 +9,7 @@ import Timeline from 'antd/lib/timeline';
 import Icon from 'antd/lib/icon';
 import Popover from 'antd/lib/popover';
 import Tooltip from 'antd/lib/tooltip';
+import Statistic from 'antd/lib/statistic';
 import TrelloCard from './TrelloCard';
 import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
@@ -22,11 +23,28 @@ const fetchTrelloInformation = () => {
   }).then(res => res.ok && res.json());
 };
 
-const clockIcon = due => (
-  <Popover content={new Date(due).toLocaleDateString()} title="预计发布时间">
-    <Icon spin type="clock-circle-o" theme="twoTone" style={{ fontSize: 18 }} />
-  </Popover>
-);
+const clockIcon = due => {
+  const deadline = new Date(due);
+  return (
+    <Popover
+      content={
+        <Statistic.Countdown
+          title="还有"
+          value={Number(deadline)}
+          format="D 天 H 时"
+        />
+      }
+      title={`预计 ${deadline.toLocaleDateString()} 发布`}
+    >
+      <Icon
+        spin
+        type="clock-circle-o"
+        theme="twoTone"
+        style={{ fontSize: 18 }}
+      />
+    </Popover>
+  );
+};
 
 const rocketIcon = (
   <Tooltip title="已发布">
