@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Timeline from 'antd/lib/timeline';
 import Icon from 'antd/lib/icon';
 import TrelloCard from './TrelloCard';
-import ChangeLogDrawer from './ChangeLogDrawer';
 import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
 
@@ -17,6 +16,7 @@ const fetchTrelloInformation = () => {
 
 const App = () => {
   const [cards, setCards] = useState([]);
+  const [visible, setVisible] = useState([]);
   useEffect(() => {
     async function adaptApi() {
       const trelloFromCache = localStorage.getItem('trello');
@@ -33,6 +33,7 @@ const App = () => {
           ))
       );
       setCards(cards.slice(0, -1)); // 最后一张比较特殊，不需要
+      setVisible(Array.from({ length: cards.length }, () => false));
       !trelloFromCache &&
         localStorage.setItem('trello', JSON.stringify(trelloCards));
     }
@@ -40,18 +41,16 @@ const App = () => {
     adaptApi();
   }, []);
 
-  const [visible, setVisible] = useState(false);
-  const [changelog, setChangelog] = useState('');
+  const toggleDetail = useCallback(index => {
+    setVisible(state => state.map((s, i) => (i === index ? !s : s)));
+    // setChangelog(cards[index].desc);
+  }, []);
 
-  const toggleDetail = useCallback(
-    index => {
-      setVisible(!visible);
-      setChangelog(cards[index].desc);
-    },
-    [visible, cards]
+  const onClose = useCallback(
+    index =>
+      setVisible(state => state.map((s, i) => (i === index ? false : s)), []),
+    []
   );
-
-  const onClose = useCallback(() => setVisible(false), []);
 
   const section = useRef();
   useVimShortcut(section, {
@@ -71,8 +70,9 @@ const App = () => {
                 desc={card.desc}
                 fields={card.fields}
                 labels={card.labels}
-                index={index}
-                toggleDetail={toggleDetail}
+                visible={visible[index]}
+                toggleDetail={() => toggleDetail(index)}
+                onCloseDrawer={() => onClose(index)}
               />
             </Timeline.Item>
           ))}
@@ -83,12 +83,6 @@ const App = () => {
           )}
         </Timeline>
       </section>
-      <ChangeLogDrawer
-        changelog={changelog}
-        visible={visible}
-        toggleDetail={toggleDetail}
-        onClose={onClose}
-      />
     </main>
   );
 };

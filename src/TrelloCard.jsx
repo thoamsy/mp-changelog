@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import Card from 'antd/lib/card';
 import Icon from 'antd/lib/icon';
 import Typography from 'antd/lib/typography';
@@ -6,13 +6,17 @@ import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
 import Tag from 'antd/lib/tag';
 
+import ChangeLogDrawer from './ChangeLogDrawer';
+
 const TrelloCard = ({
   fields = [],
   name,
   desc,
   labels,
   toggleDetail,
-  index
+  index,
+  visible,
+  onCloseDrawer
 }) => {
   const tags = useMemo(
     () =>
@@ -24,13 +28,14 @@ const TrelloCard = ({
     [labels]
   );
 
-  const actions = useMemo(
-    () => [<Icon type="bulb" onClick={() => toggleDetail(index)} />],
-    [index, toggleDetail]
-  );
+  const actions = useMemo(() => [<Icon type="bulb" onClick={toggleDetail} />], [
+    toggleDetail
+  ]);
+
+  const cardRef = useRef();
 
   return (
-    <section tabIndex="0" className="trello-card">
+    <section tabIndex="0" className="trello-card" ref={cardRef}>
       <Card extra={tags} actions={actions} title={`版本号：${name}`}>
         <Row gutter={16}>
           {fields.map(field => (
@@ -49,6 +54,12 @@ const TrelloCard = ({
           ))}
         </Row>
       </Card>
+      <ChangeLogDrawer
+        changelog={desc}
+        container={cardRef}
+        visible={visible}
+        onClose={onCloseDrawer}
+      />
     </section>
   );
 };
