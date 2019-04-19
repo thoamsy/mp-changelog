@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo
-} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Timeline from 'antd/lib/timeline';
 import Icon from 'antd/lib/icon';
 import Popover from 'antd/lib/popover';
@@ -64,13 +58,12 @@ const App = () => {
       const { cards, customFields } = trelloCards;
       const customFieldsMap = indexById(customFields);
 
-      cards.forEach(
-        card =>
-          (card.fields = convertCustomFieldItems(
-            card.customFieldItems,
-            customFieldsMap
-          ))
-      );
+      cards.forEach(card => {
+        Object.assign(
+          card,
+          convertCustomFieldItems(card.customFieldItems, customFieldsMap)
+        );
+      });
       setCards(cards.slice(0, -1)); // 最后一张比较特殊，不需要
       setVisible(Array.from({ length: cards.length }, () => false));
       !trelloFromCache &&
@@ -116,9 +109,11 @@ const App = () => {
                 labels={card.labels}
                 due={card.due}
                 dueComplete={card.dueComplete}
+                process={card.process}
                 visible={visible[index]}
                 toggleDetail={() => toggleDetail(index)}
                 onCloseDrawer={() => onClose(index)}
+                showStep={index === 0}
               />
             </Timeline.Item>
           ))}
