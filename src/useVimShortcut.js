@@ -146,10 +146,10 @@ export default function useVimShortcut(
         ...props,
         onKeyDown: onKeyDownHandler,
         role: 'list',
-        tabIndex: autoFocus ? 0 : -1,
+        tabIndex: 0, // 如果这里强制为 0 的话，可以解决第一次按 tab 的时候，从 -1 切换到 0，没有视觉效果的问题。但是又和 autoFocus 不太对应
       };
     },
-    [onKeyDownHandler, autoFocus],
+    [onKeyDownHandler],
   );
 
   return {
