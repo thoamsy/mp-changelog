@@ -1,20 +1,20 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import Timeline from 'antd/lib/timeline';
 import Icon from 'antd/lib/icon';
 import Popover from 'antd/lib/popover';
-import Tooltip from 'antd/lib/tooltip';
-import Statistic from 'antd/lib/statistic';
 import Spin from 'antd/lib/spin';
+import Statistic from 'antd/lib/statistic';
+import Timeline from 'antd/lib/timeline';
+import Tooltip from 'antd/lib/tooltip';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import TrelloCard from './TrelloCard';
-import { indexBy, convertCustomFieldItems } from './utils';
 import useVimShortcut from './useVimShortcut';
+import { convertCustomFieldItems, indexBy } from './utils';
 
 const trelloAPI = 'https://trello.com/b/FuVtXQQ5/零售小程序版本记录.json';
 const indexById = indexBy('id');
 
 const fetchTrelloInformation = () => {
   return fetch(trelloAPI, {
-    mode: 'cors'
+    mode: 'cors',
   }).then(res => res.ok && res.json());
 };
 
@@ -60,7 +60,7 @@ const App = () => {
       cards.forEach(card => {
         Object.assign(
           card,
-          convertCustomFieldItems(card.customFieldItems, customFieldsMap)
+          convertCustomFieldItems(card.customFieldItems, customFieldsMap),
         );
       });
       setCards(cards.slice(0, -1)); // 最后一张比较特殊，不需要
@@ -77,19 +77,23 @@ const App = () => {
   const onClose = useCallback(
     index =>
       setVisible(state => state.map((s, i) => (i === index ? false : s)), []),
-    []
+    [],
   );
 
   const section = useRef();
-  useVimShortcut(section, {
+  const { getContainerProps, getFocusElementProps } = useVimShortcut(section, {
     listLength: cards.length,
-    selector: '.trello-card',
-    onEnter: toggleDetail
+    onEnter: toggleDetail,
+    autoFocus: true,
   });
 
   return (
     <div className="section">
-      <section ref={section} className="container card-container">
+      <section
+        ref={section}
+        className="container card-container"
+        {...getContainerProps()}
+      >
         <h3 className="title">零售小程序版本记录</h3>
         {cards.length ? (
           <main>
@@ -110,6 +114,7 @@ const App = () => {
                     fields={card.fields}
                     labels={card.labels}
                     due={card.due}
+                    getFocusElementProps={getFocusElementProps}
                     dueComplete={card.dueComplete}
                     process={card.process}
                     visible={visible[index]}

@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 const tagsCanFocus = [
   'a[href]',
@@ -6,7 +6,7 @@ const tagsCanFocus = [
   'input',
   'select',
   'textarea',
-  'button'
+  'button',
 ];
 const canFocusElementSelector = `a[href]:not([tabindex='-1']),
   area[href]:not([tabindex='-1']),
@@ -27,10 +27,11 @@ const canFocus = element => {
   return tabindex !== null && +tabindex >= 0;
 };
 
+const injectedClassName = '__CAN_FOCUS_ELEMENT__';
 const focusElement = element => {
   if (!canFocus(element)) {
     console.error(
-      `当前 element 不支持 focus，请添加 tabIndex，或者使用满足条件的标签: ${tagsCanFocus}`
+      `当前 element 不支持 focus，请添加 tabIndex，或者使用满足条件的标签: ${tagsCanFocus}`,
     );
     return;
   }
@@ -39,17 +40,18 @@ const focusElement = element => {
 
 export default function useVimShortcut(
   containerRef,
-  { listLength, selector, onEnter }
+  { listLength, onEnter, autoFocus },
 ) {
   const selectedIndex = useRef(-1);
   const lastKeyDown = useRef({ key: '' });
   const children = useRef([]);
 
   useEffect(() => {
-    children.current = selector
-      ? containerRef.current.querySelectorAll(selector)
-      : containerRef.current.children;
-  }, [containerRef, listLength, selector]);
+    autoFocus && containerRef.current.focus();
+    children.current = containerRef.current.querySelectorAll(
+      '.' + injectedClassName,
+    );
+  }, [autoFocus, containerRef, listLength]);
 
   const moveDown = useCallback(() => {
     let index = selectedIndex.current;
@@ -104,23 +106,54 @@ export default function useVimShortcut(
           break;
         }
 
-        case 'enter': {
-          onEnter && onEnter(index);
-          break;
-        }
         default:
           break;
       }
       lastKeyDown.current = e;
     },
-    [listLength, moveDown, onEnter]
+    [listLength, moveDown],
   );
 
-  useEffect(() => {
-    if (!containerRef.current) {
-      return;
-    }
-    window.addEventListener('keydown', onKeyDownHandler);
-    return () => window.removeEventListener('keydown', onKeyDownHandler);
-  }, [containerRef, onKeyDownHandler, selector]);
+  const getFocusElementProps = useCallback(
+    ({ onKeyDown, className = '', ...props } = {}) => {
+      return {
+        ...props,
+        role: 'listitem',
+        className: `${className} ${injectedClassName}`,
+        tabIndex: 0,
+        'aria-current': selectedIndex.index,
+        onKeyDown: event => {
+          switch (event.key) {
+            case 'Enter': {
+              if (!event.metaKey || event.shiftKey) {
+                onKeyDown && onKeyDown(event);
+                onEnter && onEnter(selectedIndex.current);
+              }
+              break;
+            }
+            default:
+              break;
+          }
+        },
+      };
+    },
+    [onEnter],
+  );
+
+  const getContainerProps = useCallback(
+    props => {
+      return {
+        ...props,
+        onKeyDown: onKeyDownHandler,
+        role: 'list',
+        tabIndex: autoFocus ? 0 : -1,
+      };
+    },
+    [onKeyDownHandler, autoFocus],
+  );
+
+  return {
+    getContainerProps,
+    getFocusElementProps,
+  };
 }

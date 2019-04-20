@@ -1,13 +1,12 @@
-import React, { useMemo, useRef } from 'react';
 import Card from 'antd/lib/card';
-import Icon from 'antd/lib/icon';
-import Typography from 'antd/lib/typography';
-import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
-import Tag from 'antd/lib/tag';
-import Steps from 'antd/lib/steps';
 import Divider from 'antd/lib/divider';
-
+import Icon from 'antd/lib/icon';
+import Row from 'antd/lib/row';
+import Steps from 'antd/lib/steps';
+import Tag from 'antd/lib/tag';
+import Typography from 'antd/lib/typography';
+import React, { useMemo, useRef } from 'react';
 import ChangeLogDrawer from './ChangeLogDrawer';
 
 const TrelloCard = ({
@@ -20,7 +19,8 @@ const TrelloCard = ({
   toggleDetail,
   index,
   visible,
-  onCloseDrawer
+  onCloseDrawer,
+  getFocusElementProps,
 }) => {
   const tags = useMemo(
     () =>
@@ -29,12 +29,12 @@ const TrelloCard = ({
           {label.name}
         </Tag>
       )),
-    [labels]
+    [labels],
   );
 
   const actions = useMemo(
     () => [<Icon type="ellipsis" onClick={toggleDetail} />],
-    [toggleDetail]
+    [toggleDetail],
   );
 
   const steps = useMemo(
@@ -52,13 +52,13 @@ const TrelloCard = ({
           <Divider />
         </>
       ),
-    [process.length, showStep]
+    [process.length, showStep],
   );
 
   const cardRef = useRef();
 
   return (
-    <section tabIndex="0" className="trello-card" ref={cardRef}>
+    <section {...getFocusElementProps()} ref={cardRef}>
       <Card extra={tags} actions={actions} title={`版本号：${name}`}>
         {steps}
         <Row gutter={16}>
