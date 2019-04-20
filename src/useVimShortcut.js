@@ -1,13 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-const tagsCanFocus = [
-  'a[href]',
-  'area[href]',
-  'input',
-  'select',
-  'textarea',
-  'button',
-];
 const canFocusElementSelector = `a[href]:not([tabindex='-1']),
   area[href]:not([tabindex='-1']),
   input:not([disabled]):not([tabindex='-1']),
@@ -31,7 +23,7 @@ const injectedClassName = '__CAN_FOCUS_ELEMENT__';
 const focusElement = element => {
   if (!canFocus(element)) {
     console.error(
-      `当前 element 不支持 focus，请添加 tabIndex，或者使用满足条件的标签: ${tagsCanFocus}`,
+      `当前 element 不支持 focus，请在合适的 element 上使用 “getFocusElementProps()”`,
     );
     return;
   }
@@ -55,18 +47,24 @@ export default function useVimShortcut(
 
   const moveDown = useCallback(() => {
     let index = selectedIndex.current;
-    if (index < listLength - 1) selectedIndex.current = ++index;
+    if (index < listLength - 1) {
+      selectedIndex.current = ++index;
+    } else {
+      return false;
+    }
     focusElement(children.current[index]);
+    return true;
   }, [listLength]);
 
   const moveUp = () => {
     let index = selectedIndex.current;
-    if (index < 1) return;
+    if (index < 1) return false;
     selectedIndex.current = --index;
     focusElement(children.current[index]);
     if (!index) {
       document.body.scrollIntoView();
     }
+    return true;
   };
 
   const onKeyDownHandler = useCallback(
@@ -75,12 +73,12 @@ export default function useVimShortcut(
       let index = selectedIndex.current;
       switch (key) {
         case 'tab': {
-          if (e.shiftKey) {
-            moveUp();
+          const stillInContainer = e.shiftKey ? moveUp() : moveDown();
+          if (stillInContainer) {
+            e.preventDefault();
           } else {
-            moveDown();
+            selectedIndex.current = e.shiftKey ? -1 : listLength;
           }
-          e.preventDefault();
           break;
         }
         case 'arrowdown':
@@ -101,6 +99,8 @@ export default function useVimShortcut(
             e.metaKey === lastKeyDown.current.metaKey
           ) {
             selectedIndex.current = index = 0;
+          } else {
+            break;
           }
           focusElement(children.current[index]);
           break;
