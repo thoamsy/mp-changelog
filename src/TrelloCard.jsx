@@ -1,42 +1,14 @@
 import React, { useMemo, useRef } from 'react';
-import Card from 'antd/lib/card';
 import Icon from 'antd/lib/icon';
+import Markdown from 'markdown-it';
 import Typography from 'antd/lib/typography';
-import Row from 'antd/lib/row';
 import Col from 'antd/lib/col';
-import Tag from 'antd/lib/tag';
 import Steps from 'antd/lib/steps';
 import Divider from 'antd/lib/divider';
 
-import ChangeLogDrawer from './ChangeLogDrawer';
+const md = new Markdown();
 
-const TrelloCard = ({
-  fields = [],
-  showStep,
-  process,
-  name,
-  desc,
-  labels,
-  toggleDetail,
-  index,
-  visible,
-  onCloseDrawer
-}) => {
-  const tags = useMemo(
-    () =>
-      labels.map(label => (
-        <Tag key={label.id} color={label.color}>
-          {label.name}
-        </Tag>
-      )),
-    [labels]
-  );
-
-  const actions = useMemo(
-    () => [<Icon type="ellipsis" onClick={toggleDetail} />],
-    [toggleDetail]
-  );
-
+const TrelloCard = ({ version, showStep, process, name, desc, labels }) => {
   const steps = useMemo(
     () =>
       showStep && (
@@ -52,43 +24,37 @@ const TrelloCard = ({
           <Divider />
         </>
       ),
-    [process.length, showStep]
+    [process.length, showStep],
   );
 
   const cardRef = useRef();
+  const changelogWithParse = useMemo(() => md.render(desc), [desc]);
 
   return (
-    <section tabIndex="0" className="trello-card" ref={cardRef}>
-      <Card extra={tags} actions={actions} title={`版本号：${name}`}>
-        {steps}
-        <Row gutter={16}>
-          {fields.length ? (
-            fields.map(field => (
-              <Col span={24} key={field.id}>
-                <Typography.Title level={4}>{field.name}</Typography.Title>
-                <Typography.Paragraph>
-                  {typeof field.value === 'boolean' ? (
-                    <p>
-                      已发布 <Icon type="smile" twoToneColor />
-                    </p>
-                  ) : (
-                    field.value
-                  )}
-                </Typography.Paragraph>
-              </Col>
-            ))
-          ) : (
-            <Col span={24}>
-              <Typography.Paragraph>状态待更新</Typography.Paragraph>
-            </Col>
-          )}
-        </Row>
-      </Card>
-      <ChangeLogDrawer
-        changelog={desc}
-        container={cardRef}
-        visible={visible}
-        onClose={onCloseDrawer}
+    <section tabIndex="0" ref={cardRef}>
+      {steps}
+      {version ? (
+        <Col span={24} key={version.id}>
+          <Typography.Title level={4}>{version.name}</Typography.Title>
+          <Typography.Paragraph>
+            {typeof version.value === 'boolean' ? (
+              <p>
+                已发布 <Icon type="smile" twoToneColor />
+              </p>
+            ) : (
+              <strong>{version.value}</strong>
+            )}
+          </Typography.Paragraph>
+        </Col>
+      ) : (
+        <Col span={24}>
+          <Typography.Paragraph>状态待更新</Typography.Paragraph>
+        </Col>
+      )}
+      <Divider />
+      <section
+        className="content"
+        dangerouslySetInnerHTML={{ __html: changelogWithParse }}
       />
     </section>
   );
