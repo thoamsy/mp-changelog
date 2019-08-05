@@ -8,6 +8,7 @@ body,
 #root,
 .section {
   background: var(--bg-color);
+  min-height: 100vh;
 }
 
 section.content {

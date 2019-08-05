@@ -15,9 +15,26 @@ const fetchTrelloInformation = () => {
   }).then(res => res.ok && res.json());
 };
 
+const LIGHT = '';
+const DARK = 'BLACK';
+
 const App = () => {
   const [cards, setCards] = useState([]);
   const [visible, setVisible] = useState([]);
+  const [tagColor, setColor] = useState(() =>
+    window.matchMedia('(prefers-color-scheme: dark)').matches ? DARK : LIGHT,
+  );
+
+  useEffect(() => {
+    const darkMode = window.matchMedia('(prefers-color-scheme: dark)');
+    const handler = e => {
+      e.matches ? setColor(DARK) : setColor(LIGHT);
+    };
+    darkMode.addListener(handler);
+    return () => {
+      darkMode.removeListener(handler);
+    };
+  }, []);
 
   useEffect(() => {
     async function adaptApi() {
@@ -54,7 +71,7 @@ const App = () => {
                   className="trello-card"
                   showArrow={false}
                   extra={card.labels.map(label => (
-                    <Tag key={label.id} color="black">
+                    <Tag key={label.id} color={tagColor}>
                       {label.name}
                     </Tag>
                   ))}
