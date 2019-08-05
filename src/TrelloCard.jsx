@@ -1,8 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import Icon from 'antd/lib/icon';
 import Markdown from 'markdown-it';
-import Typography from 'antd/lib/typography';
-import Col from 'antd/lib/col';
 import Steps from 'antd/lib/steps';
 import Divider from 'antd/lib/divider';
 
@@ -34,22 +32,14 @@ const TrelloCard = ({ version, showStep, process, name, desc, labels }) => {
     <section tabIndex="0" ref={cardRef}>
       {steps}
       {version ? (
-        <Col span={24} key={version.id}>
-          <Typography.Title level={4}>{version.name}</Typography.Title>
-          <Typography.Paragraph>
-            {typeof version.value === 'boolean' ? (
-              <p>
-                已发布 <Icon type="smile" twoToneColor />
-              </p>
-            ) : (
-              <strong>{version.value}</strong>
-            )}
-          </Typography.Paragraph>
-        </Col>
+        <>
+          <h2 className="title is-5">{version.name}</h2>
+          <h3 className="subtitle is-6">
+            {typeof version.value === 'boolean' ? '已发布' : version.value}
+          </h3>
+        </>
       ) : (
-        <Col span={24}>
-          <Typography.Paragraph>状态待更新</Typography.Paragraph>
-        </Col>
+        <h2 className="title is-4">状态待更新</h2>
       )}
       <Divider />
       <section

@@ -1,0 +1,34 @@
+@media (prefers-color-scheme: dark) {
+  :root {
+    --title-color: rgba(250, 250, 250, 1);
+    --content-p: rgba(250, 250, 250, 0.9);
+    --invert: invert(1);
+    --image-filter: grayscale(40%);
+    --icon-filter: invert(100%);
+    --bg-color: rgba(0, 0, 0, 0.84);
+    --collapse-bg: rgba(48, 48, 48, 0.8);
+  }
+
+  img:not([src*='.svg']) {
+    filter: var(--image-filter);
+  }
+  svg {
+    filter: var(--icon-filter);
+  }
+
+  .ant-collapse {
+    background-color: var(--collapse-bg) !important;
+    border-collapse: var(--collapse-bg) !important;
+  }
+  .ant-collapse-header {
+    color: var(--content-p) !important;
+  }
+  .ant-collapse-content {
+    background-color: var(--collapse-bg) !important;
+    color: var(--content-p) !important;
+    border-color: var(--collapse-bg) !important;
+  }
+  .ant-divider.ant-divider-horizontal {
+    color: white;
+  }
+}

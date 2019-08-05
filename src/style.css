@@ -3,3 +3,32 @@
     max-width: 50%;
   }
 }
+
+body,
+#root,
+.section {
+  background: var(--bg-color);
+}
+
+section.content {
+  color: var(--content-p);
+}
+section.content h1,
+section.content h2,
+section.content h3,
+section.content h4 {
+  color: var(--title-color);
+}
+
+h1.title,
+h2.title,
+h3.title,
+h4.title,
+h5.title,
+h1.subtitle,
+h2.subtitle,
+h3.subtitle,
+h4.subtitle,
+h5.subtitle {
+  color: var(--title-color);
+}

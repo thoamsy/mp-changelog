@@ -43,7 +43,9 @@ const App = () => {
   return (
     <div className="section">
       <section className="container card-container">
-        <h3 className="title">零售小程序版本记录</h3>
+        <h3 className="title" style={{ color: 'var(--title-color)' }}>
+          零售小程序版本记录
+        </h3>
         {cards.length ? (
           <main>
             <Collapse activeKey={visible} onChange={onChangeCollapse}>
